@@ -1,6 +1,8 @@
 package types
 
-import "github.com/gruntwork-io/terratest/modules/terraform"
+import (
+	"github.com/gruntwork-io/terratest/modules/terraform"
+)
 
 type GenericTFModuleConfig struct {
 	//the framework standard subset of attributes
@@ -17,4 +19,9 @@ type TestContext struct {
 	TestConfigFldrName        string
 	TestConfigFileName        string
 	TerratestTerraformOptions *terraform.Options
+	CurrentTestName           string
+}
+
+func (ctx *TestContext) IsCurrentTest(testName string) bool {
+	return ctx.CurrentTestName == testName
 }
