@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
+	route53_types "github.com/aws/aws-sdk-go-v2/service/route53/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,4 +34,11 @@ func GetHostedZoneById(t *testing.T, zone_id string) *route53.GetHostedZoneOutpu
 	})
 	require.NoError(t, err)
 	return zone
+}
+func LookupDNSRecordInPublicRoute53ZoneByDNSProtocol(t *testing.T, zone_id string, fullQualifiedRecordName string, recType string) (*route53.TestDNSAnswerOutput, error) {
+	return GetAWSApiRoute53Client(t).TestDNSAnswer(context.Background(), &route53.TestDNSAnswerInput{
+		HostedZoneId: &zone_id,
+		RecordName:   &fullQualifiedRecordName,
+		RecordType:   route53_types.RRType(recType),
+	})
 }

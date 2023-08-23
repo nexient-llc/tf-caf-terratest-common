@@ -28,13 +28,16 @@ func internalRunSetupTestTeardown(t *testing.T, dir string, testFile string, tes
 	// load config
 	LoadRequestedInfraDefinitionFromTfVarsOut(t, dir, testFile, testCtx.TestConfig)
 	testCtx.TerratestTerraformOptions = NewTerratestTerraformOptions(dir, testFile)
+	testCtx.CurrentTestName = filepath.Base(dir)
+
 	// Apply - unless Regression Mode or local iteration Stage skipped
 	if !targetInfraReadOnly {
 		stage := test_structure.RunTestStage
-		defer stage(t, "teardown_test_"+filepath.Base(dir), func() {
+
+		defer stage(t, "teardown_test_"+testCtx.CurrentTestName, func() {
 			teardownTestGeneric(t, testCtx)
 		})
-		stage(t, "setup_test_"+filepath.Base(dir), func() {
+		stage(t, "setup_test_"+testCtx.CurrentTestName, func() {
 			setupTestGeneric(t, testCtx)
 		})
 	}
