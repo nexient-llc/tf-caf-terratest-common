@@ -8,7 +8,8 @@
 Terratest support utitities and test runners supporting CAF framework terraform modules auto tests in pipeline
 1. To keep infra tests code DRY and composable, reusable functions extracted into this dedicated repo and to be included by TF modules tests
 2. Tests are configuration driven, to be reusable and aggregatable for higher level customer project specific integration testing
-3. configuration is shared across infra deployment (terraform) and infra test (terratest) automation
+3. Configuration is shared across infra deployment (terraform) and infra test (terratest) automation
+3. Automated pipelines friendly. Configuration switches by OS env vars
 
 
 By default test suite pointed to <Module Repo>/examples and expects configuration variables in test.tfvars
@@ -90,12 +91,26 @@ require (
 )
 ```
 
+### GoLang
+
+To use "github.com/nexient-llc" private repository when develop or run GoLang code
+
+```
+go env -w GOPRIVATE='github.com/nexient-llc/'
+```
+
 ### Pipeline integration
 
 For unattended CiCd pipelines to preauthenhhicate Github.
-Examples are:
-for https auth: git config --add --global url."https://oauth2:$GITHUB_PTA_TOKEN@github.com/".insteadOf "https://github.com/"
-for ssh auth: git config --add --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+
+for https auth:
+```
+git config --add --global url."https://oauth2:$GITHUB_PTA_TOKEN@github.com/".insteadOf "https://github.com/"
+```
+for ssh auth:
+```
+git config --add --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+```
 
 ### Prerequisites
 
