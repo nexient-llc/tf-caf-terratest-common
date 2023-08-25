@@ -1,6 +1,8 @@
 package types
 
 import (
+	"testing"
+
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
@@ -24,4 +26,23 @@ type TestContext struct {
 
 func (ctx *TestContext) IsCurrentTest(testName string) bool {
 	return ctx.CurrentTestName == testName
+}
+func (ctx *TestContext) SkipIfTestIsNotIn(t *testing.T, testName ...string) {
+	for _, testName := range testName {
+		if ctx.CurrentTestName == testName {
+			t.SkipNow()
+		}
+	}
+}
+
+type SecurityGroupT struct {
+	EgressWithCidrBlocks []struct {
+		CidrBlocksCommaSeparated string `json:"cidr_blocks"`
+		CidrBlocks               []string
+		FromPort                 int    `json:"from_port"`
+		Protocol                 string `json:"protocol"`
+		ToPort                   int    `json:"to_port"`
+	} `json:"egress_with_cidr_blocks"`
+	IngressCidrBlocks []string `json:"ingress_cidr_blocks"`
+	IngressRules      []string `json:"ingress_rules"`
 }
