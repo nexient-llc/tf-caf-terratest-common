@@ -27,12 +27,13 @@ type TestContext struct {
 func (ctx *TestContext) IsCurrentTest(testName string) bool {
 	return ctx.CurrentTestName == testName
 }
-func (ctx *TestContext) SkipIfTestIsNotIn(t *testing.T, testName ...string) {
+func (ctx *TestContext) EnabledOnlyForTests(t *testing.T, testName ...string) {
 	for _, testName := range testName {
 		if ctx.CurrentTestName == testName {
-			t.SkipNow()
+			return
 		}
 	}
+	t.SkipNow()
 }
 
 type SecurityGroupT struct {
