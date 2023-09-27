@@ -5,59 +5,72 @@
 
 ## Overview
 
-Terratest support utitities and test runners supporting CAF framework terraform modules auto tests in pipeline
-1. To keep infra tests code DRY and composable, reusable functions extracted into this dedicated repo and to be included by TF modules tests
+Terratest support utitities and test runners supporting Common Automation Framework (CXAF) terraform modules running automated tests in pipelines.  
+
+Goals:
+1. To keep infra test code DRY and composable, reusable functions have been extracted into this dedicated repo which can be included by TF module tests
 2. Tests are configuration driven, to be reusable and aggregatable for higher level customer project specific integration testing
 3. Configuration is shared across infra deployment (terraform) and infra test (terratest) automation
-3. Automated pipelines friendly. Configuration switches by OS env vars
+3. Automated pipeline friendly. Configuration switches are driven by OS env vars
 
+## Usage
 
-By default test suite pointed to <Module Repo>/examples and expects configuration variables in test.tfvars
+By default test suites are pointed to `<Module Repo>/examples` and expect configuration variables in test.tfvars
+
 ```
 make check
 ```
 
-To point to customer project specific terraform code
+To point to customer project specific terraform code:
+
 ```
 DSO_INFRA_TEST_CONFIG_FOLDER=/projects/abc/ make check
 ```
 
 To override default test.tfvars
+
 ```
 DSO_INFRA_TEST_CONFIG_FOLDER=/projects/abc/ DSO_INFRA_TEST_CONFIG_TFVAR_FILENAME=project.tfvars make check
 ```
 
-tests and inidvidual test stages can be skipped
-Example:
-<tf module repo>
-examples/
-   ecs_example/
-       main.tf
-	   test.tfvars
-   eks_example/
-		main.tf
-		test.tfvars
+### Stages
 
-To skip a test when run test for a module
+Tests and individual test stages can be skipped. Example:
+
+```
+<tf module repo>/
+	examples/
+		ecs_example/
+			main.tf
+			test.tfvars
+		eks_example/
+			main.tf
+			test.tfvars
+```
+
+To skip a test:
+
 ```
 DSO_INFRA_TEST_SKIP_TEST_<name of test TF folder> make check
-```
-```
+# from layout above:
 DSO_INFRA_TEST_SKIP_TEST_ecs_example make check
 ```
 
-To disable selected stage(s) of the test
+To disable selected stage(s) of the test:
+
 ```
 SKIP_teardown_test_eks_example=y make check
 ```
 
 TODO - to pickup from multi tfvars to align to any project file naming convention
 
-## Reusing test impl for high env post deployment regression testing
+## Reuse
 
-We want reuse same test implementation for a TF module development and for regression testing of a project that includes the module, probably among multi other ones
-Not every test can be reused. As a low level primitive TF module, like "DNS record" has to have an extensive test fixture.
-We solve it by introducing naming convention for GoLang tests. Those safe to be composed/reused from higher level pipelines have TestComposable prefix in GoLang test name.
+We want reuse the same test implementation for a TF module development and for regression testing of a project that includes that module, probably among multi other ones.
+
+Not every test can be reused. A low-level primitive TF module, like "DNS record", has to have an extensive test fixture.
+We solve it by introducing a naming convention for GoLang tests. Those safe to be composed/reused from higher level pipelines have a `TestComposable` prefix in their GoLang test name.
+
 Example:
 
 ```
@@ -93,7 +106,7 @@ require (
 
 ### GoLang
 
-To use "github.com/nexient-llc" private repository when develop or run GoLang code
+To use "github.com/nexient-llc" private repository when developing or running GoLang code:
 
 ```
 go env -w GOPRIVATE='github.com/nexient-llc/'
@@ -101,18 +114,21 @@ go env -w GOPRIVATE='github.com/nexient-llc/'
 
 ### Pipeline integration
 
-For unattended CiCd pipelines to preauthenhhicate Github.
+For unattended CI//CD pipelines, you must pre-authenticate to Github.
 
-for https auth:
+#### HTTPS authentication
+
 ```
 git config --add --global url."https://oauth2:$GITHUB_PTA_TOKEN@github.com/".insteadOf "https://github.com/"
 ```
-for ssh auth:
+
+#### SSH authentication
+
 ```
 git config --add --global url."ssh://git@github.com/".insteadOf "https://github.com/"
 ```
 
-### Prerequisites
+## Prerequisites
 
 - [asdf](https://github.com/asdf-vm/asdf) used for tool version management
 - [make](https://www.gnu.org/software/make/) used for automating various functions of the repo
@@ -138,9 +154,9 @@ asdf install
 
 ## Pre-Commit hooks
 
-[.pre-commit-config.yaml](.pre-commit-config.yaml) file defines certain `pre-commit` hooks that are relevant to terraform, golang and common linting tasks. There are no custom hooks added.
+A [.pre-commit-config.yaml](.pre-commit-config.yaml) file defines certain `pre-commit` hooks that are relevant to terraform, golang and common linting tasks. There are no custom hooks added.
 
-`commitlint` hook enforces commit message in certain format. The commit contains the following structural elements, to communicate intent to the consumers of your commit messages:
+`commitlint` hook enforces that commit messages in a certain format (see [Conventional Commits](https://www.conventionalcommits.org/)). The commit message must contain the following structural elements, to communicate intent to the consumers of your commits:
 
 - **fix**: a commit of the type `fix` patches a bug in your codebase (this correlates with PATCH in Semantic Versioning).
 - **feat**: a commit of the type `feat` introduces a new feature to the codebase (this correlates with MINOR in Semantic Versioning).
@@ -158,11 +174,11 @@ footers other than BREAKING CHANGE: <description> may be provided and follow a c
 
 Base configuration used for this project is [commitlint-config-conventional (based on the Angular convention)](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional#type-enum)
 
-If you are a developer using vscode, [this](https://marketplace.visualstudio.com/items?itemName=joshbolduc.commitlint) plugin may be helpful.
+If you are a developer using vscode, the [commitlint](https://marketplace.visualstudio.com/items?itemName=joshbolduc.commitlint) plugin may be helpful.
 
-`detect-secrets-hook` prevents new secrets from being introduced into the baseline. TODO: INSERT DOC LINK ABOUT HOOKS
+`detect-secrets-hook` prevents new secrets from being introduced into the baseline. [TODO: INSERT DOC LINK ABOUT HOOKS]
 
-In order for `pre-commit` hooks to work properly
+In order for `pre-commit` hooks to work properly:
 
 - You need to have the pre-commit package manager installed. [Here](https://pre-commit.com/#install) are the installation instructions.
 - `pre-commit` would install all the hooks when commit message is added by default except for `commitlint` hook. `commitlint` hook would need to be installed manually using the command below
@@ -171,7 +187,7 @@ In order for `pre-commit` hooks to work properly
 pre-commit install --hook-type commit-msg
 ```
 
-## To run local quality check
+## To run a local quality check
 
 1. For development/enhancements to this module locally, you'll need to install all of its components. This is controlled by the `configure` target in the project's [`Makefile`](./Makefile). Before you can run `configure`, familiarize yourself with the variables in the `Makefile` and ensure they're pointing to the right places.
 
@@ -182,11 +198,11 @@ make configure
 This adds in several files and directories that are ignored by `git`. They expose many new Make targets.
 
 2. The first target you care about is `check`.
-If `make check` target is successful, developer is good to commit the code to git repo.
+If the `make check` target is successful, the developer can commit the code to git.
 
 `make check` target
 
-- runs `terraform commands` to `lint`,`validate` and `plan` terraform code.
+- runs `terraform commands` to `lint`, `validate` and `plan` terraform code.
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
-- runs `terratest`. This is integration test suit.
+- runs `terratest`. This is integration test suite.
 - runs `opa` tests
