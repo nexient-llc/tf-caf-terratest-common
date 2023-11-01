@@ -139,15 +139,13 @@ git config --add --global url."ssh://git@github.com/".insteadOf "https://github.
 Run the following commands to prep repo and enable all `Makefile` commands to run
 
 ```shell
-asdf plugin add terraform
-asdf plugin add tflint
+asdf plugin add conftest
 asdf plugin add golang
 asdf plugin add golangci-lint
-asdf plugin add nodejs
-asdf plugin add opa
-asdf plugin add conftest
 asdf plugin add pre-commit
-asdf plugin add terragrunt
+asdf plugin add terraform
+asdf plugin add terraform-docs
+asdf plugin add tflint
 
 asdf install
 ```
@@ -205,4 +203,3 @@ If the `make check` target is successful, the developer can commit the code to g
 - runs `terraform commands` to `lint`, `validate` and `plan` terraform code.
 - runs `conftests`. `conftests` make sure `policy` checks are successful.
 - runs `terratest`. This is integration test suite.
-- runs `opa` tests
